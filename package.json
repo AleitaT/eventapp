@@ -1,0 +1,22 @@
+{
+  "name": "eventapp",
+  "version": "1.0.0",
+  "description": "api app for cs 496",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AleitaT/eventapp.git"
+  },
+  "author": "alieta train",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AleitaT/eventapp/issues"
+  },
+  "homepage": "https://github.com/AleitaT/eventapp#readme",
+  "dependencies": {
+    "react-native-cli": "^2.0.1"
+  }
+}
