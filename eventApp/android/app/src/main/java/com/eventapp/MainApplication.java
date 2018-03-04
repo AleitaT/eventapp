@@ -10,7 +10,6 @@ import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
 import com.facebook.reactnative.androidsdk.FBSDKPackage;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -33,18 +32,18 @@ public class MainApplication extends Application implements ReactApplication {
   @Override
   public boolean getUseDeveloperSupport() {
   return BuildConfig.DEBUG;
-}
+  }
 
-@Override
-protected List<ReactPackage> getPackages() {
-return Arrays.<ReactPackage>asList(
-new MainReactPackage(),
-new FBSDKPackage(mCallbackManager));
-}
-};
+  @Override
+  protected List<ReactPackage> getPackages() {
+    return Arrays.<ReactPackage>asList(
+    new MainReactPackage(),
+    new FBSDKPackage(mCallbackManager));
+    }
+  };
 
-@Override
-public ReactNativeHost getReactNativeHost() {
-return mReactNativeHost;
-}
+  @Override
+  public ReactNativeHost getReactNativeHost() {
+    return mReactNativeHost;
+  }
 }
