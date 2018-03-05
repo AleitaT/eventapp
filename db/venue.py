@@ -40,7 +40,7 @@ class VenueHandler(webapp2.RequestHandler):
 
     if not self.err:
       # all venues should start at sea
-      new_venue = venue(**body)
+      new_venue = Venue(**body)
       new_venue.put()
       venue_dict = new_venue.to_dict()
       venue_dict['id'] = new_venue.key.urlsafe()
