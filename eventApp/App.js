@@ -17,10 +17,13 @@ import {
   View,
   OnPress,
   ActivityIndicator,
+ItemSeparatorComponent,
   AsyncStorage,
   FlatList,
   StatusBar,
+TouchableHighlight,
   TextInput,
+TouchableOpacity,
 } from 'react-native';
 
 import {
@@ -179,7 +182,7 @@ class HomeScreen extends React.Component {
 /*******************************************
 * VENUES SCREEN 
 ********************************************/
-class VenuesScreen extends React.Component {
+class VenuesScreen extends React.PureComponent {
   static navigationOptions = {
     title: 'Find a venue',
   };
@@ -209,6 +212,12 @@ class VenuesScreen extends React.Component {
         console.error(error);
     });
   }
+  _onPress = () => {
+    this.props.onPressItem(this.props.id);
+  };
+  space(){
+    return(<View style={{height: 50, width: 2, backgroundColor: 'black'}}/>)
+  }
   render() {
     if(this.state.isLoading) {
       return(
@@ -217,17 +226,35 @@ class VenuesScreen extends React.Component {
         </View>
       );
     } 
-    return(
+    return( 
       <View style={{flex: 1, paddingTop:20}}>
-        <FlatList
-          data={this.state.dataSource}
-          renderItem={({item }) => <Text>{item.name}, {item.city},{item.state}</Text>}
-          keyExtractor={(item, index) => index}
-        />
+       <FlatList vertical={true}
+        data={this.state.dataSource}
+        ItemSeparatorComponent={this.space}
+        renderItem={({item, separators}) => (
+          <TouchableHighlight
+            onPress={() => this._onPress(item)}
+            onShowUnderlay={separators.highlight}
+            onHideUnderlay={separators.unhighlight}>
+            <View style={{backgroundColor: 'white'}}>
+              <Text style={{fontSize: 23}}>{item.name}</Text>
+              <Text style={{textAlign:'right'}}>{item.city}, {item.state}</Text>
+            </View>
+          </TouchableHighlight>
+        )}
+      />
+      <Button style={styles.wideButton}
+          onPress={() => this.props.navigation.navigate('AddVenueScreen')}
+          color="#2E4172"
+          title="Add a Venue"
+          accessibilityLabel="Navigate to your profile"/> 
       </View>
+
     );
   }
 }
+
+
 
 /*******************************************
 * A D D  A  V E N U E  S C R E E N 
@@ -260,34 +287,40 @@ class AddVenueScreen extends React.Component {
   }
   render() {
     return (
-      <View style={styles.container}>
-        <View>
-          <TextInput style={{flex: 1 }}
+        <View style={{
+          flex: 1,
+          paddingTop: 20,
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          textColor: 'white',
+        }}>
+          <TextInput style={{flex: 1, textColor: 'white', flexDirection: 'row', width: 300}}
             placeholder="Venue Name"
-            onChangeText={(text) => this.setState({text})}
-            value={this.state.text}
+            onChangeText={(name) => this.setState({name})}
+            value={this.state.name}
           />
-          <TextInput style={styles.input}
+          <TextInput style={{flex: 1, flexDirection: 'row', width: 300}}
             placeholder="Address"
-            onChangeText={(text) => this.setState({text})}
-            value={this.state.text}
+            onChangeText={(address) => this.setState({address})}
+            value={this.state.address}
           />
-          <TextInput style={styles.input}
+          <TextInput style={{flex: 1, flexDirection: 'row', width: 300}}
             placeholder="City"
-            onChangeText={(text) => this.setState({text})}
-            value={this.state.text}
+            onChangeText={(city) => this.setState({city})}
+            value={this.state.city}
           />
-          <TextInput style={styles.input}
+          <TextInput style={{flex: 1, flexDirection: 'row', width: 300}}
             placeholder="State"
-            onChangeText={(text) => this.setState({text})}
-            value={this.state.text}
+            onChangeText={(state) => this.setState({state})}
+            value={this.state.state}
           />
-          <Button
-          title="Add Venue"
-          onPress={() => this.props.handleSubmit}
-          />
+          <Button style={styles.wideButton}
+            onPress={() => this.props.handleSubmit}
+            color="#2E4172"
+            title="Submit"
+            accessibilityLabel="Add a venue entry"/> 
         </View>
-      </View>
     );
   }
 }
