@@ -1,6 +1,6 @@
 
 
 android:
-	react-native run-android
+		react-native run-android
 ios:
-	react-native run-ios
+		react-native run-ios

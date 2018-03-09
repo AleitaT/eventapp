@@ -28,10 +28,11 @@ import {
   SwitchNavigator,
 } from 'react-navigation';
 
-
 const FBSDK = require('react-native-fbsdk');
-const {LoginButton, GraphRequest, GraphRequestManager, AccessToken} = FBSDK;
-
+const {
+  LoginButton,
+  AccessToken
+} = FBSDK;
 
 /*******************************************
 * AUTH LOADING SCREEN 
@@ -41,11 +42,9 @@ class AuthLoadingScreen extends React.Component {
     super();
     this._bootstrapAsync();
   }
-
   // Fetch the token from storage then navigate to our appropriate place
   _bootstrapAsync = async () => {
     const userToken = await AsyncStorage.getItem('userToken');
-
     // This will switch to the App screen or Auth screen and this loading
     // screen will be unmounted and thrown away.
     this.props.navigation.navigate(userToken ? 'App' : 'Auth');
@@ -62,18 +61,16 @@ class AuthLoadingScreen extends React.Component {
   }
 }
 
-
 /*******************************************
 * SIGN IN SCREEN 
 ********************************************/
 class SignInScreen extends React.Component {
   static navigationOptions = {
-    title: 'Please sign in',
+    title: 'Sign in to begin',
   };
   render() {
     return (
       <View style={styles.container}>
-        <Button title="Sign in!" onPress={this._signInAsync} />
         <LoginButton
           publishPermissions={["publish_actions"]}
           onLoginFinished={
@@ -83,7 +80,13 @@ class SignInScreen extends React.Component {
               } else if (result.isCancelled) {
                 alert("Login was cancelled");
               } else {
-                alert("Login was successful with permissions: " + result.grantedPermissions);
+                AccessToken.getCurrentAccessToken().then(
+                  (data) => {
+                    //alert(data.accessToken.toString())
+                    AsyncStorage.setItem('userToken', data.accessToken.toString());
+                    this.props.navigation.navigate('App');
+                  }
+                )
               }
             }
           }
@@ -93,57 +96,93 @@ class SignInScreen extends React.Component {
 
     );
   }
-
-  _signInAsync = async () => {
-    await AsyncStorage.setItem('userToken', 'abc');
-    this.props.navigation.navigate('App');
-  };
 }
 
 /*******************************************
 * HOME SCREEN 
 ********************************************/
 class HomeScreen extends React.Component {
+  static navigationOptions = {
+    title: 'Find your zone',
+    headerRight: <LoginButton style={
+          {
+            margin: 10,
+            padding: 10,
+            height: 30,
+            width: 80,
+            borderColor:'black',
+            }
+          }
+          publishPermissions={["publish_actions"]}
+            onLoginFinished={
+              (error, result) => {
+                if (error) {
+                  alert("Login failed with error: " + result.error);
+                } else if (result.isCancelled) {
+                  alert("Login was cancelled");
+                } else {
+                  AccessToken.getCurrentAccessToken().then(
+                  (data) => {
+                    //alert(data.accessToken.toString())
+                    AsyncStorage.setItem('userToken', data.accessToken.toString());
+                    this.props.navigation.navigate('App');
+                  }
+                )
+              }
+            }
+          }
+          onLogoutFinished={() => alert("User logged out")}
+        />    
+  };
   render() {
     return (
-      <View style={styles.container}>
+      <View style={{
+        flex: 1,
+        flexDirection: 'column',
+        justifyContent: 'space-evenly',
+        backgroundColor: '#7887AB'
+      }}>
         <Text style={styles.body}>
            Select from the below view  To experience this app
           You can either look at and add venues by navigating to 
           the Venue screen  Or Explire events or add an event by
          navigating to the events screen
         </Text>
-        <View>
-          <Button
+        <View style={{
+          flex:1,
+          flexDirection: 'column',
+          justifyContent: 'space-evenly',
+        }}>
+          <Button style={styles.wideButton}
             onPress={() => this.props.navigation.navigate('Venues')}
             title="Venues"
             color="#2E4172"
             accessibilityLabel="Navigate to Venue Screen"/>
-          <Button
+          <Button style={styles.wideButton}          
             onPress={() => this.props.navigation.navigate('Events')}
             title="Events"
             color="#2E4172"
             accessibilityLabel="Navigate to Event Screen"/>
-          <Button
+          <Button style={styles.wideButton}
             onPress={() => this.props.navigation.navigate('Profile')}
             title="Profile"
             color="#2E4172"
             accessibilityLabel="Navigate to your profile"/>
-          <Button title="Actually, sign me out :)" onPress={this._signOutAsync} />
+          </View>
+          <View>
         </View>
       </View>
     );
   }
-  _signOutAsync = async () => {
-    await AsyncStorage.clear();
-    this.props.navigation.navigate('Auth');
-  };
 }
 
 /*******************************************
 * VENUES SCREEN 
 ********************************************/
 class VenuesScreen extends React.Component {
+  static navigationOptions = {
+    title: 'Find a venue',
+  };
   constructor(props){
     super(props);
     this.state ={ isLoading: true}
@@ -152,17 +191,19 @@ class VenuesScreen extends React.Component {
     return fetch('https://diyeventapp.appspot.com/venues',{
       method: 'GET',
       headers: {
+        Authorization: "Bearer AIzaSyAX2ADuOPwwoFZRSj5rW4TfWF7tIFcosIc",
         Accept: 'application/json',
         'Content-Type': 'application/json',
       }
-    }) 
+    })
       .then((response) => response.json())
       .then((responseJson) => {
+        console.log('parsed json', responseJson);
         this.setState({
           isLoading: false, 
           dataSource: responseJson.venues,
         }, function(){
-          console.log(response);
+          //console.log(response);
         });
       }).catch((error) => {
         console.error(error);
@@ -180,7 +221,7 @@ class VenuesScreen extends React.Component {
       <View style={{flex: 1, paddingTop:20}}>
         <FlatList
           data={this.state.dataSource}
-          renderItem={({item}) => <Text>{item.title}, {item.releaseYear}</Text>}
+          renderItem={({item }) => <Text>{item.name}, {item.city},{item.state}</Text>}
           keyExtractor={(item, index) => index}
         />
       </View>
@@ -189,9 +230,12 @@ class VenuesScreen extends React.Component {
 }
 
 /*******************************************
-* V E N U E S   S C R E E N 
+* A D D  A  V E N U E  S C R E E N 
 ********************************************/
 class AddVenueScreen extends React.Component {
+  static navigationOptions = {
+    title: 'Add a venue',
+  };
   handleSubmit = () => {
     const value = this._form.getValue(); 
     console.log('value: ', value);  
@@ -218,7 +262,7 @@ class AddVenueScreen extends React.Component {
     return (
       <View style={styles.container}>
         <View>
-          <TextInput style={styles.input}
+          <TextInput style={{flex: 1 }}
             placeholder="Venue Name"
             onChangeText={(text) => this.setState({text})}
             value={this.state.text}
@@ -252,6 +296,9 @@ class AddVenueScreen extends React.Component {
 * E V E N T S  S C R E E N 
 ********************************************/
 class EventsScreen extends React.Component {
+  static navigationOptions = {
+    title: 'Find an event',
+  };
   render() {
     return (
       <View>
@@ -332,15 +379,17 @@ const styles = StyleSheet.create({
     margin: 10,
   },  
   body: {
+    flex:1,
     fontSize: 20,
     textAlign: 'left',
     color: '#D6DBE8',
     margin: 20,
   },
-  buttons: {
-    margin: 100,
-    padding: 100,
-    width: 100,
+  wideButton: {
+    width: 90,
+    height: 300,
+    borderWidth:1,
+    borderColor:'black',
   },
   instructions: {
     textAlign: 'center',
