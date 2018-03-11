@@ -227,7 +227,8 @@ class VenuesScreen extends React.PureComponent {
       );
     } 
     return( 
-      <View style={{flex: 1, paddingTop:20}}>
+      <View style={{flex: 10, paddingTop:20, flexDirection: 'column'}}>
+      <View style={{flex:9}}>
        <FlatList vertical={true}
         data={this.state.dataSource}
         ItemSeparatorComponent={this.space}
@@ -236,19 +237,26 @@ class VenuesScreen extends React.PureComponent {
             onPress={() => this._onPress(item)}
             onShowUnderlay={separators.highlight}
             onHideUnderlay={separators.unhighlight}>
-            <View style={{backgroundColor: 'white'}}>
-              <Text style={{fontSize: 23}}>{item.name}</Text>
-              <Text style={{textAlign:'right'}}>{item.city}, {item.state}</Text>
+            <View style={{backgroundColor: '#B9E397', padding: 10, margin: 10}}>
+              <Text style={
+                {fontSize: 23, fontWeight: 'bold', color: '#224C00'}
+                }>{item.name}</Text>
+              <Text style={
+                {textAlign:'right', color: '#224C00', borderColor: '#3E7213'}
+                }>{item.city}, {item.state}</Text>
             </View>
           </TouchableHighlight>
         )}
       />
-      <Button style={styles.wideButton}
+      </View>
+      <View style={{flex:1, backgroundColor: '#2E4172'}}>
+        <Button style={{}}
           onPress={() => this.props.navigation.navigate('AddVenueScreen')}
           color="#2E4172"
           title="Add a Venue"
           accessibilityLabel="Navigate to your profile"/> 
       </View>
+    </View>
 
     );
   }
@@ -263,24 +271,36 @@ class AddVenueScreen extends React.Component {
   static navigationOptions = {
     title: 'Add a venue',
   };
-  handleSubmit = () => {
-    const value = this._form.getValue(); 
-    console.log('value: ', value);  
-    fetch('https://diyeventapp.appspot.com/venue/', {
+  _handleSubmit = () => {
+    const payload = {
+      name: this.state.name,
+      address: this.state.address,
+      city: this.state.city,
+      state: this.state.state,
+    }
+    fetch('https://diyeventapp.appspot.com/venues/', {
       method: 'POST',
       headers: {
         Accept: 'application/json',
+        Authorization: "Bearer AIzaSyAX2ADuOPwwoFZRSj5rW4TfWF7tIFcosIc",
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        name: value.name,
-        address: value.address,
-        city: value.city,
-        state: value.state,
-        tags: value.tags,
-      }),
+        name: payload.name,
+        address: payload.address,
+        city: payload.city,
+        state: payload.state,
+      })
+    })
+    .then((response) => response.text())
+    .then((responseText) => {
+      this.props.navigation.navigate('Venues');
+    })
+    .catch((error) => {
+      console.error(error);
     });
   }
+
   constructor(props) {
     super(props);
     this.state = {text: ''};
@@ -288,38 +308,41 @@ class AddVenueScreen extends React.Component {
   render() {
     return (
         <View style={{
-          flex: 1,
-          paddingTop: 20,
+          flex: 2,
+          paddingTop: 100,
           flexDirection: 'column',
-          justifyContent: 'center',
+          justifyContent: 'space-around',
           alignItems: 'center',
           textColor: 'white',
         }}>
-          <TextInput style={{flex: 1, textColor: 'white', flexDirection: 'row', width: 300}}
+          <TextInput style={{width: 400}}
             placeholder="Venue Name"
-            onChangeText={(name) => this.setState({name})}
+            onChangeText={(value) => this.setState({name: value})}
             value={this.state.name}
           />
-          <TextInput style={{flex: 1, flexDirection: 'row', width: 300}}
+          <TextInput style={{width: 400}}
             placeholder="Address"
-            onChangeText={(address) => this.setState({address})}
+            onChangeText={(value) => this.setState({address: value})}
             value={this.state.address}
           />
-          <TextInput style={{flex: 1, flexDirection: 'row', width: 300}}
+          <TextInput style={{width: 400}}
             placeholder="City"
-            onChangeText={(city) => this.setState({city})}
+            onChangeText={(value) => this.setState({city: value})}
             value={this.state.city}
           />
-          <TextInput style={{flex: 1, flexDirection: 'row', width: 300}}
+          <TextInput style={{width: 400}}
             placeholder="State"
-            onChangeText={(state) => this.setState({state})}
+            onChangeText={(value) => this.setState({state: value})} 
             value={this.state.state}
           />
-          <Button style={styles.wideButton}
-            onPress={() => this.props.handleSubmit}
+          <View style={
+            {flex:1, width: 400, height: 200}}>
+            <Button style={{width:400}}
+            onPress={this._handleSubmit}
             color="#2E4172"
             title="Submit"
             accessibilityLabel="Add a venue entry"/> 
+          </View>
         </View>
     );
   }
@@ -419,9 +442,10 @@ const styles = StyleSheet.create({
     margin: 20,
   },
   wideButton: {
-    width: 90,
+    width: 400,
     height: 300,
     borderWidth:1,
+    flex:1,
     borderColor:'black',
   },
   instructions: {
