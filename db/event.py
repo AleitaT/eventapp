@@ -32,7 +32,6 @@ class EventHandler(webapp2.RequestHandler):
     self.response.write(message)
     self.err = True
 
-  # 
   def post(self, request):    
     try:
       body = json.loads(self.request.body)
@@ -41,7 +40,7 @@ class EventHandler(webapp2.RequestHandler):
 
     if not self.err:
       # all events should start at sea
-      new_event = event(**body)
+      new_event = Event(**body)
       new_event.put()
       event_dict = new_event.to_dict()
       event_dict['id'] = new_event.key.urlsafe()
