@@ -226,9 +226,7 @@ class VenuesScreen extends React.PureComponent {
         console.error(error);
     });
   }
-  _onPress = () => {
-    this.props.onPressItem(this.props.id);
-  };
+
   space(){
     return(<View style={{height: 1, width: 1, backgroundColor: 'black'}}/>)
   }
@@ -240,6 +238,8 @@ class VenuesScreen extends React.PureComponent {
         </View>
       );
     } 
+      const { navigate } = this.props.navigation;
+
     return( 
       <View style={{flex: 1, flexDirection: 'column'}}>
       <View>
@@ -248,7 +248,7 @@ class VenuesScreen extends React.PureComponent {
         ItemSeparatorComponent={this.space}
         renderItem={({item, separators}) => (
           <TouchableHighlight
-            onPress={() => this._onPress(item)}
+            onPress={() => navigate('VenueRecord', {id: item.id})}
             onShowUnderlay={separators.highlight}
             onHideUnderlay={separators.unhighlight}>
             <View style={{backgroundColor: '#B9E397', padding: 20}}>
@@ -263,7 +263,7 @@ class VenuesScreen extends React.PureComponent {
             </View>
           </TouchableHighlight>
         )}
-        keyExtractor={(item, index) => item.self}
+        keyExtractor={(item, index) => item.id}
       />
       </View>
       <View style={{
@@ -280,6 +280,83 @@ class VenuesScreen extends React.PureComponent {
           </View>
         </TouchableNativeFeedback>
       </View>
+    </View>
+
+    );
+  }
+}
+
+
+/*******************************************
+* E D I T  A  V E N U E  S C R E E N 
+********************************************/
+class VenueRecordScreen extends React.PureComponent {
+ static navigationOptions = {
+    title: 'View or Edit Venue',
+  };
+   state = {
+      dataSource: ''
+   }
+  constructor(props){
+    super(props);
+    this.state ={ isLoading: true}
+  }
+
+  componentDidMount() {
+    const record = this.props.navigation.state.params.id;
+    const uri = `https://diyeventapp.appspot.com/venues/${encodeURIComponent(record)}`;
+    fetch(uri,{
+      method: 'GET',
+      headers: {
+        Authorization: "Bearer AIzaSyAX2ADuOPwwoFZRSj5rW4TfWF7tIFcosIc",
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+      }
+    })
+      .then((response) => response.json())
+      .then((responseJson) => {
+        console.log("response json", responseJson);
+        this.setState({
+          isLoading: false, 
+          name: responseJson.name,
+          address: responseJson.address,
+          all_ages: responseJson.all_ages,
+          city: responseJson.city,
+          state: responseJson.state,
+          description: responseJson.description,
+          self: responseJson.self
+        }, function(){
+          //console.log(responseJson);
+        });
+      }).catch((error) => {
+        console.error(error);
+    });
+  }
+  render() {
+      const { navigate } = this.props.navigation;
+
+    return( 
+      <View style={{flex: 1, flexDirection: 'column'}}>  
+      <Text>
+        {this.state.name}
+      </Text>
+      <Text>
+        {this.state.address}
+      </Text>
+      <Text>
+        {this.state.name}
+      </Text>
+      <Text>
+      {this.state.city}
+      </Text>
+        <TouchableNativeFeedback
+          onPress={() => navigate('VenueRecord', {self: this.state.self})}
+          background={TouchableNativeFeedback.SelectableBackground()}>
+          <View>
+            <Text style={styles.buttonText}>Edit Event +</Text>
+          </View>
+        </TouchableNativeFeedback>
+
     </View>
 
     );
@@ -322,7 +399,6 @@ class AddVenueScreen extends React.Component {
       console.error(error);
     });
   }
-
   constructor(props) {
     super(props);
     this.state = {text: ''};
@@ -383,7 +459,7 @@ class EventsScreen extends React.Component {
     this.state ={ isLoading: true}
   }
   componentDidMount() {
-    return fetch('https://diyeventapp.appspot.com/events',{
+    return fetch('https://diyeventapp.appspot.com/events/',{
       method: 'GET',
       headers: {
         Authorization: "Bearer AIzaSyAX2ADuOPwwoFZRSj5rW4TfWF7tIFcosIc",
@@ -396,7 +472,7 @@ class EventsScreen extends React.Component {
         console.log('parsed json', responseJson);
         this.setState({
           isLoading: false, 
-          dataSource: responseJson.venues,
+          dataSource: responseJson.events,
         }, function(){
           //console.log(response);
         });
@@ -437,7 +513,7 @@ class EventsScreen extends React.Component {
                 textAlign:'right', 
                 color: '#224C00', 
                 borderColor: '#3E7213'
-              }}>{item.venue},{item.city}, {item.state}</Text>
+              }}>{item.venue}, {item.city}, {item.state}</Text>
             </View>
           </TouchableHighlight>
         )}
@@ -474,12 +550,13 @@ class AddEventScreen extends React.Component {
   };
   _handleSubmit = () => {
     const payload = {
-      name: this.state.name,
-      address: this.state.address,
+      title: this.state.title,
+      venue: this.state.venue,
+      date: this.state.date,
       city: this.state.city,
-      state: this.state.state,
+      state: this.state.state
     }
-    fetch('https://diyeventapp.appspot.com/venues/', {
+    fetch('https://diyeventapp.appspot.com/events/', {
       method: 'POST',
       headers: {
         Accept: 'application/json',
@@ -487,15 +564,17 @@ class AddEventScreen extends React.Component {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        name: payload.name,
-        address: payload.address,
+        title: payload.title,
+        date: payload.date,
+        venue: payload.venue,
         city: payload.city,
         state: payload.state,
       })
     })
     .then((response) => response.text())
     .then((responseText) => {
-      this.props.navigation.navigate('Venues');
+      console.log("response", responseText);
+      this.props.navigation.navigate('Events');
     })
     .catch((error) => {
       console.error(error);
@@ -517,14 +596,19 @@ class AddEventScreen extends React.Component {
           textColor: 'white',
         }}>
           <TextInput style={{width: 400}}
-            placeholder="Venue Name"
-            onChangeText={(value) => this.setState({name: value})}
-            value={this.state.name}
+            placeholder="Event Title"
+            onChangeText={(value) => this.setState({title: value})}
+            value={this.state.title}
           />
           <TextInput style={{width: 400}}
-            placeholder="Address"
-            onChangeText={(value) => this.setState({address: value})}
-            value={this.state.address}
+            placeholder="Venue"
+            onChangeText={(value) => this.setState({venue: value})}
+            value={this.state.venue}
+          />
+          <TextInput style={{width: 400}}
+            placeholder="Date format 11/11/2011"
+            onChangeText={(value) => this.setState({date: value})}
+            value={this.state.date}
           />
           <TextInput style={{width: 400}}
             placeholder="City"
@@ -541,7 +625,7 @@ class AddEventScreen extends React.Component {
               onPress={this._handleSubmit}
               background={TouchableNativeFeedback.SelectableBackground()}>
               <View style={styles.buttonView}>
-                <Text style={styles.buttonText}>Submit Venue + </Text>
+                <Text style={styles.buttonText}>Submit Event + </Text>
               </View>
             </TouchableNativeFeedback>
           </View>
@@ -583,6 +667,12 @@ const RootStack = StackNavigator({
   },
   AddVenueScreen: {
     screen: AddVenueScreen,
+  },  
+  VenueRecord: {
+    screen: VenueRecordScreen,
+  },
+  AddEvent: {
+    screen: AddEventScreen,
   }
 });
 const AuthStack = StackNavigator({ SignIn: SignInScreen });
