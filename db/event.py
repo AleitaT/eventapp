@@ -10,7 +10,6 @@ import webapp2
 import json
 from format import jsonHandler, getAPIObject
 
-
 class Event(ndb.Model):
   title = ndb.StringProperty(required=True)
   date = ndb.StringProperty(required=True)
@@ -102,17 +101,8 @@ class EventHandler(webapp2.RequestHandler):
   def delete(self, id=None):
     if id:
       event = ndb.Key(urlsafe=id).get()
-      if event:
-        for slip in Slip.query(Slip.current_event == id):
-          if slip.current_event:
-            slip.current_event = ""
-          if slip.arrival_date:
-            slip.arrival_date = ""
-          slip.put()
-        event.key.delete()
-        self.logging(200, "INFO: 1 event deleted")
-      else:
-        self.logging(405, "ERROR: bad event id")
+      event.key.delete()
+      self.logging(200, "INFO: 1 event deleted")
     else: 
       self.logging(403, "ERROR: Id required for DELETE")
 

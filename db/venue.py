@@ -9,7 +9,7 @@ from google.appengine.ext import ndb
 import webapp2
 import json
 from format import jsonHandler, getAPIObject
-
+from event import Event, EventHandler
 
 class Venue(ndb.Model):
   name = ndb.StringProperty(required=True)
@@ -82,7 +82,7 @@ class VenueHandler(webapp2.RequestHandler):
         if 'state' in venue_data:
           venue.state = venue_data['state']        
         if 'tags' in venue_data:
-          venue.genre = venue_data['tags']
+          venue.tags = venue_data['tags']
         if 'description' in venue_data:
           venue.description = venue_data['description']
         if 'all_ages' in venue_data:
@@ -100,10 +100,8 @@ class VenueHandler(webapp2.RequestHandler):
       venue = ndb.Key(urlsafe=id).get()
       if venue:
         for event in Event.query(Event.venue == id):
-          if slip.current_venue:
-            slip.current_venue = ""
-          if slip.arrival_date:
-            slip.arrival_date = ""
+          if event.venue:
+            event.venue = ""
           slip.put()
         venue.key.delete()
         self.logging(200, "INFO: 1 venue deleted")
