@@ -40,6 +40,35 @@ const {
 class VenueRecordScreen extends React.PureComponent {
  static navigationOptions = {
     title: 'View or Edit Venue',
+ headerRight: <LoginButton style={
+          {
+            margin: 10,
+            padding: 10,
+            height: 30,
+            width: 80,
+            borderColor:'black',
+            }
+          }
+          publishPermissions={["publish_actions"]}
+            onLoginFinished={
+              (error, result) => {
+                if (error) {
+                  alert("Login failed with error: " + result.error);
+                } else if (result.isCancelled) {
+                  alert("Login was cancelled");
+                } else {
+                  AccessToken.getCurrentAccessToken().then(
+                  (data) => {
+                    //alert(data.accessToken.toString())
+                    AsyncStorage.setItem('userToken', data.accessToken.toString());
+                    this.props.navigation.navigate('App');
+                  }
+                )
+              }
+            }
+          }
+          onLogoutFinished={() => alert("User logged out")}
+        />    
   };
    state = {
       dataSource: ''
@@ -105,37 +134,41 @@ class VenueRecordScreen extends React.PureComponent {
       const { navigate } = this.props.navigation;
     return( 
       <View style={{flex: 1, flexDirection: 'column'}}>  
-      <Text>
+      <Text style={{fontSize:40}}>
         {this.state.name}
       </Text>
-      <Text>
+      <Text style={{fontSize:20}}>
         {this.state.address}
       </Text>
-      <Text>
-        {this.state.name}
+      <Text style={{fontSize:20}}>
+        {this.state.state}
       </Text>
-      <Text>
+      <Text style={{fontSize:20}}>
       {this.state.city}
+      </Text>      
+      <Text style={{fontSize:20}}>
+      {this.state.description}
       </Text>
-        <TouchableNativeFeedback
-          onPress={() => navigate('EditVenueRecord', {
-            self: this.state.self,
-            name: this.state.name, 
-            address: this.state.address,
-            state: this.state.state,
-            city: this.state.city, 
-            all_ages: this.state.all_ages,
-            description: this.state.description
-          })}
-          background={TouchableNativeFeedback.SelectableBackground()}>
-          <View>
+      <TouchableNativeFeedback
+        onPress={() => navigate('EditVenueRecord', {
+          self: this.state.self,
+          name: this.state.name, 
+          address: this.state.address,
+          state: this.state.state,
+          city: this.state.city, 
+          all_ages: this.state.all_ages,
+          description: this.state.description
+          })
+        }
+        background={TouchableNativeFeedback.SelectableBackground()}>
+          <View style={styles.buttonView}>
             <Text style={styles.buttonText}>Edit Event</Text>
           </View>
         </TouchableNativeFeedback>
         <TouchableNativeFeedback
           onPress={this._handleDelete}
           background={TouchableNativeFeedback.SelectableBackground()}>
-          <View>
+            <View style={styles.buttonView}>
             <Text style={styles.buttonText}>Delete Event</Text>
           </View>
         </TouchableNativeFeedback>
@@ -181,7 +214,7 @@ const styles = StyleSheet.create({
     borderColor:'black',
   },
   buttonView: {
-    width: 400, 
+    borderColor: 'white',
     height: 80,
     alignItems: 'center',
     backgroundColor: '#2E4172',

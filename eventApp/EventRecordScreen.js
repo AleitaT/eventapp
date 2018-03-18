@@ -40,6 +40,34 @@ const {
 class VenueRecordScreen extends React.PureComponent {
  static navigationOptions = {
     title: 'Your Event Details',
+    headerRight: <LoginButton style={
+          {
+            margin: 10,
+            padding: 10,
+            height: 30,
+            width: 80,
+            borderColor:'black',
+            }
+          }
+          publishPermissions={["publish_actions"]}
+            onLoginFinished={
+              (error, result) => {
+                if (error) {
+                  alert("Login failed with error: " + result.error);
+                } else if (result.isCancelled) {
+                  alert("Login was cancelled");
+                } else {
+                  AccessToken.getCurrentAccessToken()
+                  .then((data) => {
+                    //alert(data.accessToken.toString())
+                    AsyncStorage.setItem('userToken', data.accessToken.toString());
+                    this.props.navigation.navigate('App');
+                  })
+              }
+            }
+          }
+          onLogoutFinished={() => alert("User logged out")}
+        />    
   };
    state = {
       dataSource: ''
@@ -105,22 +133,22 @@ class VenueRecordScreen extends React.PureComponent {
       const { navigate } = this.props.navigation;
     return( 
       <View style={{flex: 1, flexDirection: 'column'}}>  
-      <Text>
+      <Text style={{fontSize :40}}>
         {this.state.title}
       </Text>
-      <Text>
+      <Text style={{fontSize :20}}>
         {this.state.date}
       </Text>
-      <Text>
+      <Text style={{fontSize :20}}>
         {this.state.genre}
       </Text>
-      <Text>
+      <Text style={{fontSize :20}}>
       {this.state.city}
       </Text>      
-      <Text>
+      <Text style={{fontSize :20}}>
       {this.state.state}
       </Text>      
-      <Text>
+      <Text style={{fontSize :20}}>
       {this.state.venue}
       </Text>
         <TouchableNativeFeedback
@@ -134,21 +162,21 @@ class VenueRecordScreen extends React.PureComponent {
             venue: this.state.venye
           })}
           background={TouchableNativeFeedback.SelectableBackground()}>
-          <View>
+          <View style={styles.buttonView}>
             <Text style={styles.buttonText}>Edit Event</Text>
           </View>
         </TouchableNativeFeedback>
         <TouchableNativeFeedback
           onPress={this._handleDelete}
           background={TouchableNativeFeedback.SelectableBackground()}>
-          <View>
+          <View style={styles.buttonView}>
             <Text style={styles.buttonText}>Delete Event</Text>
           </View>
         </TouchableNativeFeedback>
         <TouchableNativeFeedback
           onPress={() => navigate('AssignVenueToEvent', { id: this.state.self})}
           background={TouchableNativeFeedback.SelectableBackground()}>
-          <View>
+          <View style={styles.buttonView}>
             <Text style={styles.buttonText}>Assign Venue</Text>
           </View>
         </TouchableNativeFeedback>

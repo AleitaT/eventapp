@@ -104,7 +104,8 @@ class SignInScreen extends React.Component {
               }
             }
           }
-          onLogoutFinished={() => alert("User logged out")}
+          onLogoutFinished={() => 
+          this.props.navigation.navigate('SignIn') }
         />    
       </View>
 

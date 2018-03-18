@@ -36,7 +36,36 @@ const {
 ************************************************/
 class EditVenueRecordScreen extends React.Component {
   static navigationOptions = {
-    title: 'Add a venue',
+    title: 'Edit venue record',
+     headerRight: <LoginButton style={
+          {
+            margin: 10,
+            padding: 10,
+            height: 30,
+            width: 80,
+            borderColor:'black',
+            }
+          }
+          publishPermissions={["publish_actions"]}
+            onLoginFinished={
+              (error, result) => {
+                if (error) {
+                  alert("Login failed with error: " + result.error);
+                } else if (result.isCancelled) {
+                  alert("Login was cancelled");
+                } else {
+                  AccessToken.getCurrentAccessToken().then(
+                  (data) => {
+                    //alert(data.accessToken.toString())
+                    AsyncStorage.setItem('userToken', data.accessToken.toString());
+                    this.props.navigation.navigate('App');
+                  }
+                )
+              }
+            }
+          }
+          onLogoutFinished={() => alert("User logged out")}
+        />    
   };
   _handleSubmit = () => {
         const self = this.props.navigation.state.params.self;
@@ -48,7 +77,6 @@ class EditVenueRecordScreen extends React.Component {
       state: this.state.state,
     }
     const id = self.substring(8);
-    alert(id);
     fetch(`https://diyeventapp.appspot.com/venues/${id}`, {
       method: 'PATCH',
       headers: {
@@ -65,7 +93,7 @@ class EditVenueRecordScreen extends React.Component {
     })
     .then((response) => response.text())
     .then((responseText) => {
-      this.props.navigation.navigate('Venues');
+      this.props.navigation.navigate('Home');
     })
     .catch((error) => {
       console.error(error);
@@ -112,7 +140,7 @@ class EditVenueRecordScreen extends React.Component {
             value={this.state.state}
           />
           <TextInput style={{width: 400}}
-            placeholder="Enter a description"
+            placeholder={description}
             onChangeText={(value) => this.setState({description: value})} 
             value={this.state.description}
           />

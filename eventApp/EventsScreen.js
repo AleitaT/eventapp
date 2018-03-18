@@ -40,6 +40,35 @@ const {
 class EventsScreen extends React.Component {
   static navigationOptions = {
     title: 'Find events',
+ headerRight: <LoginButton style={
+          {
+            margin: 10,
+            padding: 10,
+            height: 30,
+            width: 80,
+            borderColor:'black',
+            }
+          }
+          publishPermissions={["publish_actions"]}
+            onLoginFinished={
+              (error, result) => {
+                if (error) {
+                  alert("Login failed with error: " + result.error);
+                } else if (result.isCancelled) {
+                  alert("Login was cancelled");
+                } else {
+                  AccessToken.getCurrentAccessToken().then(
+                  (data) => {
+                    //alert(data.accessToken.toString())
+                    AsyncStorage.setItem('userToken', data.accessToken.toString());
+                    this.props.navigation.navigate('App');
+                  }
+                )
+              }
+            }
+          }
+          onLogoutFinished={() => alert("User logged out")}
+        />    
   };
   constructor(props){
     super(props);

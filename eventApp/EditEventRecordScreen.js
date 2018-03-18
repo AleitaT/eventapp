@@ -37,6 +37,35 @@ const {
 class EditVenueRecordScreen extends React.Component {
   static navigationOptions = {
     title: 'Add a venue',
+ headerRight: <LoginButton style={
+          {
+            margin: 10,
+            padding: 10,
+            height: 30,
+            width: 80,
+            borderColor:'black',
+            }
+          }
+          publishPermissions={["publish_actions"]}
+            onLoginFinished={
+              (error, result) => {
+                if (error) {
+                  alert("Login failed with error: " + result.error);
+                } else if (result.isCancelled) {
+                  alert("Login was cancelled");
+                } else {
+                  AccessToken.getCurrentAccessToken().then(
+                  (data) => {
+                    //alert(data.accessToken.toString())
+                    AsyncStorage.setItem('userToken', data.accessToken.toString());
+                    this.props.navigation.navigate('App');
+                  }
+                )
+              }
+            }
+          }
+          onLogoutFinished={() => alert("User logged out")}
+        />    
   };
   _handleSubmit = () => {
         const self = this.props.navigation.state.params.self;
@@ -48,7 +77,6 @@ class EditVenueRecordScreen extends React.Component {
       state: this.state.state,
     }
     const id = self.substring(8);
-    alert(id);
     fetch(`https://diyeventapp.appspot.com/venues/${id}`, {
       method: 'PATCH',
       headers: {
@@ -65,7 +93,7 @@ class EditVenueRecordScreen extends React.Component {
     })
     .then((response) => response.text())
     .then((responseText) => {
-      this.props.navigation.navigate('Venues');
+      this.props.navigation.navigate('Home');
     })
     .catch((error) => {
       console.error(error);
@@ -77,19 +105,19 @@ class EditVenueRecordScreen extends React.Component {
   }
    render() {
     const self = this.props.navigation.state.params.self;
-    const name = this.props.navigation.state.params.name;    
-    const address = this.props.navigation.state.params.address;
+    const title = this.props.navigation.state.params.title;    
+    const date = this.props.navigation.state.params.date;
+    const genre = this.props.navigation.state.params.genre;
     const city = this.props.navigation.state.params.city;
     const state = this.props.navigation.state.params.state;
     const description = this.props.navigation.state.params.description;
     const all_ages = this.props.navigation.state.params.all_ages;
     return (
         <View style={{
-          flex: 2,
+          flex: 1,
           paddingTop: 50,
           flexDirection: 'column',
-          justifyContent: 'flex-start',
-          alignItems: 'center',
+   
         }}>
           <TextInput style={{width: 400}}
             placeholder={title}
@@ -168,7 +196,6 @@ const styles = StyleSheet.create({
     borderColor:'black',
   },
   buttonView: {
-    width: 400, 
     height: 80,
     alignItems: 'center',
     backgroundColor: '#2E4172',
