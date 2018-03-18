@@ -59,9 +59,11 @@ class AddEventScreen extends React.Component {
       body: JSON.stringify({
         title: payload.title,
         date: payload.date,
-        venue: payload.venue,
         city: payload.city,
         state: payload.state,
+        genre: payload.genre,
+        description: payload.description,
+        all_ages: payload.all_ages
       })
     })
     .then((response) => response.text())
@@ -94,9 +96,9 @@ class AddEventScreen extends React.Component {
             value={this.state.title}
           />
           <TextInput style={{width: 400}}
-            placeholder="Venue"
-            onChangeText={(value) => this.setState({venue: value})}
-            value={this.state.venue}
+            placeholder="genre"
+            onChangeText={(value) => this.setState({genre: value})}
+            value={this.state.genre}
           />
           <TextInput style={{width: 400}}
             placeholder="Date format 11/11/2011"
@@ -112,6 +114,16 @@ class AddEventScreen extends React.Component {
             placeholder="State"
             onChangeText={(value) => this.setState({state: value})} 
             value={this.state.state}
+          />
+          <TextInput style={{width: 400}}
+            placeholder="Description"
+            onChangeText={(value) => this.setState({description: value})} 
+            value={this.state.description}
+          />
+          <TextInput style={{width: 400}}
+            placeholder="true = all ages, false = over 21"
+            onChangeText={(value) => this.setState({all_ages: value})} 
+            value={this.state.all_ages}
           />
           <View>
             <TouchableNativeFeedback

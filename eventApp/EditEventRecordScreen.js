@@ -92,14 +92,14 @@ class EditVenueRecordScreen extends React.Component {
           alignItems: 'center',
         }}>
           <TextInput style={{width: 400}}
-            placeholder={name}
-            onChangeText={(value) => this.setState({name: value})}
-            value={this.state.name}
+            placeholder={title}
+            onChangeText={(value) => this.setState({title: value})}
+            value={this.state.title}
           />
           <TextInput style={{width: 400}}
-            placeholder={address}
-            onChangeText={(value) => this.setState({address: value})}
-            value={this.state.address}
+            placeholder={date}
+            onChangeText={(value) => this.setState({date: value})}
+            value={this.state.date}
           />
           <TextInput style={{width: 400}}
             placeholder={city}
@@ -112,12 +112,17 @@ class EditVenueRecordScreen extends React.Component {
             value={this.state.state}
           />
           <TextInput style={{width: 400}}
-            placeholder="Enter a description"
+            placeholder={genre}
+            onChangeText={(value) => this.setState({genre: value})} 
+            value={this.state.genre}
+          />
+          <TextInput style={{width: 400}}
+            placeholder={description}
             onChangeText={(value) => this.setState({description: value})} 
             value={this.state.description}
           />
           <TextInput style={{width: 400}}
-            placeholder="True or False"
+            placeholder={all_ages}
             onChangeText={(value) => this.setState({all_ages: value})} 
             value={this.state.all_ages}
           />

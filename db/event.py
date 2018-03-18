@@ -77,7 +77,7 @@ class EventHandler(webapp2.RequestHandler):
         if 'date' in event_data:
           event.date = event_data['date']
         if 'venue' in event_data:
-          event.address = event_data['venue']
+          event.venue = event_data['venue']
           # check to see if venue exists error if not
           # to do 
         if 'city' in event_data:

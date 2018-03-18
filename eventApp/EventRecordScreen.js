@@ -145,6 +145,13 @@ class VenueRecordScreen extends React.PureComponent {
             <Text style={styles.buttonText}>Delete Event</Text>
           </View>
         </TouchableNativeFeedback>
+        <TouchableNativeFeedback
+          onPress={() => navigate('AssignVenueToEvent', { id: this.state.self})}
+          background={TouchableNativeFeedback.SelectableBackground()}>
+          <View>
+            <Text style={styles.buttonText}>Assign Venue</Text>
+          </View>
+        </TouchableNativeFeedback>
     </View>
 
     );

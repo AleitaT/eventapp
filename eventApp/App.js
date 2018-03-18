@@ -46,6 +46,7 @@ var EventsScreen = require('./EventsScreen.js');
 var EventRecordScreen = require('./EventRecordScreen.js');
 var EditEventRecordScreen = require('./EditEventRecordScreen.js');
 var AddEventScreen = require('./AddEventScreen.js');
+var AssignVenueToEventScreen = require('./AssignVenueToEventScreen.js');
 
 /*******************************************
 * AUTH LOADING SCREEN 
@@ -251,6 +252,12 @@ const RootStack = StackNavigator({
   },
   EditVenueRecord: {
     screen: EditVenueRecordScreen,
+  },
+  EditEventRecord: {
+    screen: EditEventRecordScreen,
+  },
+  AssignVenueToEvent: {
+    screen: AssignVenueToEventScreen,
   },
 });
 const AuthStack = StackNavigator({ SignIn: SignInScreen });
