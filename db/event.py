@@ -10,7 +10,6 @@ import webapp2
 import json
 from format import jsonHandler, getAPIObject
 
-
 class Event(ndb.Model):
   title = ndb.StringProperty(required=True)
   date = ndb.StringProperty(required=True)
@@ -32,7 +31,6 @@ class EventHandler(webapp2.RequestHandler):
     self.response.write(message)
     self.err = True
 
-  # 
   def post(self, request):    
     try:
       body = json.loads(self.request.body)
@@ -41,7 +39,7 @@ class EventHandler(webapp2.RequestHandler):
 
     if not self.err:
       # all events should start at sea
-      new_event = event(**body)
+      new_event = Event(**body)
       new_event.put()
       event_dict = new_event.to_dict()
       event_dict['id'] = new_event.key.urlsafe()
@@ -79,7 +77,7 @@ class EventHandler(webapp2.RequestHandler):
         if 'date' in event_data:
           event.date = event_data['date']
         if 'venue' in event_data:
-          event.address = event_data['venue']
+          event.venue = event_data['venue']
           # check to see if venue exists error if not
           # to do 
         if 'city' in event_data:
@@ -103,17 +101,8 @@ class EventHandler(webapp2.RequestHandler):
   def delete(self, id=None):
     if id:
       event = ndb.Key(urlsafe=id).get()
-      if event:
-        for slip in Slip.query(Slip.current_event == id):
-          if slip.current_event:
-            slip.current_event = ""
-          if slip.arrival_date:
-            slip.arrival_date = ""
-          slip.put()
-        event.key.delete()
-        self.logging(200, "INFO: 1 event deleted")
-      else:
-        self.logging(405, "ERROR: bad event id")
+      event.key.delete()
+      self.logging(200, "INFO: 1 event deleted")
     else: 
       self.logging(403, "ERROR: Id required for DELETE")
 
